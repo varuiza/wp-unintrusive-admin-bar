@@ -1,18 +1,15 @@
-/* This reset stays even though unintrusive-admin-bar.php removes WP core's own
-   `_admin_bar_bump_cb` (which prints a `margin-top` on html): it's a defensive
-   fallback in case a theme adds its own top spacing tied to `body.admin-bar`. */
+/* This is a defensive fallback in case a theme adds its own top spacing tied to `body.admin-bar`. */
 html {
     margin-top: 0 !important;
 }
+
 #wpadminbar {
     display: none;
     z-index: 999999;
 }
-#uab-btn-show-admin-bar,
-#uab-btn-hide-admin-bar {
-    font: 400 16px/1 dashicons;
-}
+
 #uab-btn-show-admin-bar {
+    font: 400 16px/1 dashicons;
     text-decoration: none !important;
     position: fixed;
     top: -50px;
@@ -33,15 +30,49 @@ html {
     opacity: 1;
     transition-duration: 0.5s;
 }
-#wpadminbar #uab-btn-hide-admin-bar:before {
-    content: '\f343';
-    position: relative;
-    top: -5px;
-    width: 20px;
-    height: 20px;
+
+/* Reuses WP core's own icon markup (see the ".ab-icon" rules in wp-includes/css/admin-bar.css) */
+/* The doubled `content` declaration hides the decorative glyph from assistive tech reading generated content */
+#wpadminbar > #wp-toolbar > #wp-admin-bar-root-default #uab-btn-hide-admin-bar .ab-icon {
     margin-right: 0;
 }
+#wpadminbar #uab-btn-hide-admin-bar .ab-icon:before {
+    content: '\f343';
+    content: '\f343' / '';
+    top: 2px;
+}
+
 .uab-opaque {
     opacity: 0.5;
     transition-duration: 0.5s;
+}
+
+.uab-visually-hidden {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #uab-btn-show-admin-bar,
+    .uab-opaque {
+        transition-duration: 0s;
+    }
+}
+
+/* wp-includes/css/admin-bar.css hides every top-level #wpadminbar <li> below 782px except a closed allowlist of its own IDs (see the "Show only default top level items" rule).*/
+/* Our toggle li isn't on that list, so without this override there would be no way to hide the bar again once shown on narrow viewports. */
+@media screen and (max-width: 782px) {
+    #uab-btn-show-admin-bar {
+        font: 400 28px/1 dashicons;
+    }
+    #wpadminbar li#uab-admin-bar-toggle-li {
+        display: block !important;
+    }
 }

@@ -27,14 +27,20 @@ function uab_toggle_admin_bar_assets() {
 	$css_path = plugin_dir_path( __FILE__ ) . 'css/style.css';
 	$js_path  = plugin_dir_path( __FILE__ ) . 'js/app.js';
 
-	wp_enqueue_style( 'uab-unintrusive-admin-bar-css', plugin_dir_url( __FILE__ ) . 'css/style.css', array(), filemtime( $css_path ) );
-	wp_enqueue_script( 'uab-unintrusive-admin-bar-js', plugin_dir_url( __FILE__ ) . 'js/app.js', array( 'jquery' ), filemtime( $js_path ), true );
+	// Depending on WP core's own 'admin-bar' handles (rather than just 'jquery')
+	// guarantees our assets always load after admin-bar.css/js: admin-bar.css
+	// already pulls in 'dashicons' (which our icons rely on), and admin-bar.js
+	// is what builds the #wpadminbar DOM our script prepends a node into.
+	wp_enqueue_style( 'uab-unintrusive-admin-bar-css', plugin_dir_url( __FILE__ ) . 'css/style.css', array( 'admin-bar' ), filemtime( $css_path ) );
+	wp_enqueue_script( 'uab-unintrusive-admin-bar-js', plugin_dir_url( __FILE__ ) . 'js/app.js', array( 'jquery', 'admin-bar' ), filemtime( $js_path ), true );
 
 	wp_localize_script(
 		'uab-unintrusive-admin-bar-js',
 		'uabL10n',
 		array(
-			'hideLabel' => __( 'Hide WP Admin Bar', 'unintrusive-admin-bar' ),
+			'hideLabel'          => __( 'Hide WP Admin Bar', 'unintrusive-admin-bar' ),
+			'shownAnnouncement'  => __( 'WP Admin Bar shown', 'unintrusive-admin-bar' ),
+			'hiddenAnnouncement' => __( 'WP Admin Bar hidden', 'unintrusive-admin-bar' ),
 		)
 	);
 }
@@ -57,6 +63,6 @@ add_action( 'wp_head', 'uab_remove_padding', 1 );
  */
 function uab_add_admin_bar_toggle() {
 	$label = __( 'Show WP Admin Bar', 'unintrusive-admin-bar' );
-	echo '<a href="#" id="uab-btn-show-admin-bar" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '"></a>';
+	echo '<a href="#" id="uab-btn-show-admin-bar" title="' . esc_attr( $label ) . '" aria-label="' . esc_attr( $label ) . '" aria-controls="wpadminbar" aria-expanded="false"></a>';
 }
 add_action( 'wp_after_admin_bar_render', 'uab_add_admin_bar_toggle' );
