@@ -1,3 +1,6 @@
+/* This reset stays even though unintrusive-admin-bar.php removes WP core's own
+   `_admin_bar_bump_cb` (which prints a `margin-top` on html): it's a defensive
+   fallback in case a theme adds its own top spacing tied to `body.admin-bar`. */
 html {
     margin-top: 0 !important;
 }
@@ -19,58 +22,26 @@ html {
     color: #ccc;
     padding: 5px;
     border-radius: 5px;
-    -webkit-transition-duration: 0.5s;
-    -moz-transition-duration: 0.5s;
-    -o-transition-duration: 0.5s;
-    -ms-transition-duration: 0.5s;
     transition-duration: 0.5s;
 }
 #uab-btn-show-admin-bar:before {
-    top: 1px;
-    right: 4px;
     content: '\f120';
     color: inherit;
 }
 #uab-btn-show-admin-bar:hover {
     color: #00b9eb;
-    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
-    filter: alpha(opacity=100);
     opacity: 1;
-    -webkit-transition-duration: 0.5s;
-    -moz-transition-duration: 0.5s;
-    -o-transition-duration: 0.5s;
-    -ms-transition-duration: 0.5s;
     transition-duration: 0.5s;
 }
-#uab-admin-bar-toggle-li #uab-btn-hide-admin-bar {
-    color: #c00;
-    padding: 7px 5px;
-    vertical-align: middle;
-    margin: 0;
-}
-#uab-admin-bar-toggle-li #uab-btn-hide-admin-bar:hover {
-    color: #c00;
-}
-#uab-btn-hide-admin-bar:before {
+#wpadminbar #uab-btn-hide-admin-bar:before {
     content: '\f343';
+    position: relative;
+    top: -5px;
+    width: 20px;
+    height: 20px;
+    margin-right: 0;
 }
-.rotate {
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
-    -webkit-transition-duration: 0.5s;
-    -moz-transition-duration: 0.5s;
-    -o-transition-duration: 0.5s;
-    -ms-transition-duration: 0.5s;
-    transition-duration: 0.5s;
-}
-.opaque {
-    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)';
-    filter: alpha(opacity=50);
+.uab-opaque {
     opacity: 0.5;
-    -webkit-transition-duration: 0.5s;
-    -moz-transition-duration: 0.5s;
-    -o-transition-duration: 0.5s;
-    -ms-transition-duration: 0.5s;
     transition-duration: 0.5s;
 }

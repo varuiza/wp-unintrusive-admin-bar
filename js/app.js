@@ -1,36 +1,54 @@
+'use strict'
 jQuery(document).ready(function ($) {
-    // Add the "hide admin bar" icon to the admin bar before proceeding
-    $('#wp-admin-bar-wp-logo').before(
-        $('<li id="uab-admin-bar-toggle-li">').html(
-            '<a href="#" id="uab-btn-hide-admin-bar" title="' + uabL10n.hideLabel + '" aria-label="' + uabL10n.hideLabel + '"></a>'
-        )
-    )
+    var ANIMATION_DURATION = 300
+    // Must stay in sync with the "hidden" #uab-btn-show-admin-bar top value in css/style.css
+    var SHOW_BTN_HIDDEN_TOP = '-50px'
+    var SHOW_BTN_VISIBLE_TOP = '10px'
 
-    var btnShow = $('a#uab-btn-show-admin-bar')
-    var btnHide = $('a#uab-btn-hide-admin-bar')
+    // Add the "hide admin bar" icon to the admin bar before proceeding.
+    // #wp-admin-bar-root-default is a core WP admin bar group, unlike
+    // #wp-admin-bar-wp-logo, which other plugins/themes can remove.
+    // The "ab-item" class is what makes WP apply the active admin color
+    // scheme to this link, same as any other native admin bar icon.
+    $('<li id="uab-admin-bar-toggle-li">')
+        .append(
+            $('<a>', {
+                href: '#',
+                id: 'uab-btn-hide-admin-bar',
+                class: 'ab-item',
+                title: uabL10n.hideLabel,
+                'aria-label': uabL10n.hideLabel,
+            })
+        )
+        .prependTo('#wp-admin-bar-root-default')
+
+    var btnShow = $('#uab-btn-show-admin-bar')
+    var btnHide = $('#uab-btn-hide-admin-bar')
     var adminBar = $('#wpadminbar')
 
     // Show the button
     btnShow
-        .animate({ top: '10px' }, 300)
+        .animate({ top: SHOW_BTN_VISIBLE_TOP }, ANIMATION_DURATION)
         .delay(1000)
         .queue(function (next) {
-            $(this).addClass('opaque')
+            $(this).addClass('uab-opaque')
             next()
         })
 
     // Show the admin bar
-    btnShow.on('click', function () {
-        $(this).animate({ top: '-50px' }, 300, function () {
-            adminBar.stop(true, true).slideDown(300)
-        })
-        return false
+    btnShow.on('click', function (event) {
+        event.preventDefault()
+        $(this)
+            .stop(true, true)
+            .animate({ top: SHOW_BTN_HIDDEN_TOP }, ANIMATION_DURATION, function () {
+                adminBar.stop(true, true).slideDown(ANIMATION_DURATION)
+            })
     })
 
     // Hide the admin bar
-    btnHide.on('click', function () {
-        adminBar.stop(true, true).slideUp(300)
-        btnShow.animate({ top: '10px' }, 300)
-        return false
+    btnHide.on('click', function (event) {
+        event.preventDefault()
+        adminBar.stop(true, true).slideUp(ANIMATION_DURATION)
+        btnShow.stop(true, true).animate({ top: SHOW_BTN_VISIBLE_TOP }, ANIMATION_DURATION)
     })
 })

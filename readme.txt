@@ -50,6 +50,10 @@ Both screenshots are reproduced from the original `plasticbrain` plugin this one
 * Fix inconsistent cache-busting: each asset is now versioned from its own file's modification time.
 * Fix a malformed toggle link and add `aria-label` to both toggle buttons for screen readers.
 * Add full internationalization, including a Spanish (`es_ES`) translation.
+* Make the hide icon inherit the active admin color scheme instead of a hardcoded red, and size it like the rest of the admin bar icons.
+* Insert the hide icon next to WordPress's own default admin bar group instead of a specific menu item, so it keeps working even if that item is removed.
+* Fix animation queuing so repeated clicks on the toggle buttons no longer stack up.
+* Remove obsolete vendor prefixes and Internet Explorer 8 fallbacks no longer needed by supported browsers.
 
 == Upgrade Notice ==
 
