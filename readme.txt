@@ -12,7 +12,9 @@ Replaces the WP Admin Bar with a small, unobtrusive toggle icon in the corner of
 
 == Description ==
 
-Unintrusive Admin Bar is a simple plugin that replaces the WordPress admin bar (the bar at the top of the page that logged-in users see) with a small toggle icon in the corner of the frontend, instead of a bar that stays fixed across the whole page. Clicking the icon reveals the full admin bar; clicking the icon it shows in turn hides it again.
+Tired of clients asking you to just remove the WordPress admin bar altogether, so you lose one-click access to the dashboard for good? Annoyed by themes that don't reserve any space for it, so it overlaps your logo, your main menu, or the first row of content? Sick of that black bar eating up screen space every time you need to show a clean screenshot or a live demo to a client? Frustrated that most "hide the admin bar" plugins are all-or-nothing, so you either keep the bar or lose its shortcuts for good?
+
+Unintrusive Admin Bar is a simple plugin that replaces the WordPress admin bar (the bar at the top of the page that logged-in users see) with a small toggle icon in the corner of the frontend, instead of a bar that stays fixed across the whole page. Clicking the icon reveals the full admin bar; clicking the icon it shows in turn hides it again: always one click away, never in the way.
 
 = Credits =
 
@@ -48,12 +50,18 @@ Both screenshots are reproduced from the original `plasticbrain` plugin this one
 * Forked and hardened from `plasticbrain`'s abandoned "WP Minimize Admin Bar".
 * Gate asset loading and the admin bar padding removal behind `is_admin_bar_showing()`, so nothing runs for visitors who never see the admin bar.
 * Fix inconsistent cache-busting: each asset is now versioned from its own file's modification time.
-* Fix a malformed toggle link and add `aria-label` to both toggle buttons for screen readers.
-* Add full internationalization, including a Spanish (`es_ES`) translation.
-* Make the hide icon inherit the active admin color scheme instead of a hardcoded red, and size it like the rest of the admin bar icons.
-* Insert the hide icon next to WordPress's own default admin bar group instead of a specific menu item, so it keeps working even if that item is removed.
+* Fix a malformed toggle link.
+* Add full internationalization.
+* Make the hide icon inherit the active admin color scheme instead of a hardcoded red.
+* Add the hide icon as a native Toolbar API node (`add_node()`) in WordPress's own default admin bar group, reusing core's own icon and screen-reader-text markup, instead of a specific menu item or a JS-injected element; it now renders with the rest of the bar and never appears in wp-admin.
 * Fix animation queuing so repeated clicks on the toggle buttons no longer stack up.
 * Remove obsolete vendor prefixes and Internet Explorer 8 fallbacks no longer needed by supported browsers.
+* Fix the hide icon being invisible, and therefore stuck open, on screens narrower than 782px, where WordPress's own responsive admin bar styles hide every icon except a fixed core allowlist; size it to match the touch-target size of the rest of the admin bar icons at that width.
+* Add `aria-expanded`/`aria-controls` to both toggle buttons, move focus to the relevant toggle after showing or hiding the bar, and announce the change to screen readers via `wp.a11y.speak()`.
+* Respect the "reduce motion" operating system preference for every animation.
+* Remove the jQuery dependency entirely in favor of plain JavaScript and CSS transitions, so logged-in visitors on themes that don't otherwise need jQuery no longer have it forced onto every page.
+* Depend on WordPress's own `admin-bar` and `wp-a11y` script/style handles instead of relying on incidental load order.
+* Ship minified `style.min.css`/`app.min.js` alongside the source, and load them by default using WordPress core's own `SCRIPT_DEBUG` convention (unminified only while `SCRIPT_DEBUG` is on).
 
 == Upgrade Notice ==
 
