@@ -3,7 +3,7 @@ Contributors: varuiza
 Tags: admin bar, toolbar, hide admin bar, minimal, dashboard
 Requires at least: 6.4
 Tested up to: 7.0
-Requires PHP: 7.0
+Requires PHP: 8.0
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,13 +12,13 @@ Replaces the WP Admin Bar with a small, unobtrusive toggle icon in the corner of
 
 == Description ==
 
-Tired of clients asking you to just remove the WordPress admin bar altogether, so you lose one-click access to the dashboard for good? Annoyed by themes that don't reserve any space for it, so it overlaps your logo, your main menu, or the first row of content? Sick of that black bar eating up screen space every time you need to show a clean screenshot or a live demo to a client? Frustrated that most "hide the admin bar" plugins are all-or-nothing, so you either keep the bar or lose its shortcuts for good?
+Tired of clients asking you to just remove the WordPress admin bar (the bar at the top of the page that logged-in users see), so you lose one-click access to the dashboard for good? Annoyed by themes that don't reserve any space for it, so it overlaps your logo, your main menu, or the first row of content? Sick of that black bar eating up screen space every time you need to show a clean screenshot or a live demo to a client?
 
-Unintrusive Admin Bar is a simple plugin that replaces the WordPress admin bar (the bar at the top of the page that logged-in users see) with a small toggle icon in the corner of the frontend, instead of a bar that stays fixed across the whole page. Clicking the icon reveals the full admin bar; clicking the icon it shows in turn hides it again: always one click away, never in the way.
+Unintrusive Admin Bar is a simple plugin that replaces the WordPress admin bar with a small toggle icon in the corner of the frontend, instead of a bar that stays fixed across the whole page. Clicking the icon reveals the full admin bar; clicking the arrow that appears within it hides it again: always one click away, never in the way.
 
 = Credits =
 
-This plugin is a hardened fork of `plasticbrain`'s abandoned "WP Minimize Admin Bar", originally released under GPLv2 or later. This fork keeps the original show/hide behavior and fixes several issues found in an independent audit of that code: assets and hooks now only run while the admin bar is actually showing, cache-busting for the bundled CSS/JS is now reliable, the toggle markup is now keyboard/screen-reader accessible, and every visible string is translatable (a Spanish translation is included).
+This plugin is a hardened fork of `plasticbrain`'s abandoned "WP Minimize Admin Bar", originally released under GPLv2 or later. This fork keeps the original show/hide behavior and fixes several issues found in an independent audit of that code: assets and hooks now only run while the admin bar is actually showing, cache-busting for the bundled CSS/JS is now reliable, the toggle markup is now keyboard/screen-reader accessible, and every visible string is fully translatable, ready for a Spanish translation to be contributed on WordPress.org's translation platform once the plugin is approved.
 
 == Installation ==
 
