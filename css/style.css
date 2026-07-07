@@ -4,9 +4,8 @@ html {
 }
 
 :root {
-    /* Single source of truth for the reveal/slide timing: js/app.js reads
-       this via getComputedStyle instead of hardcoding a duration, so the
-       two can never drift out of sync. */
+    /* Single source of truth: js/app.js reads this via getComputedStyle
+       instead of hardcoding the duration. */
     --uab-animation-duration: 300ms;
 }
 
@@ -17,10 +16,9 @@ html {
     z-index: 999999;
 }
 #wpadminbar.uab-shown {
-    /* WP core keeps the bar's current (responsive) height in this custom
-       property (see wp-includes/css/admin-bar.css). Reusing it here means
-       the reveal always targets the exact right height, at any breakpoint,
-       with no need to measure it ourselves in JS. */
+    /* Core keeps the bar's current (responsive) height in this custom
+       property, so the reveal always targets the right height without
+       measuring it in JS. */
     max-height: var(--wp-admin--admin-bar--height, 32px);
 }
 
@@ -47,12 +45,13 @@ html {
     content: '\f120';
     color: inherit;
 }
-#uab-btn-show-admin-bar:hover {
+#uab-btn-show-admin-bar:hover,
+#uab-btn-show-admin-bar:focus-visible {
     color: #00b9eb;
     opacity: 1;
 }
 
-/* Reuses WP core's own icon markup (see the ".ab-icon" rules in wp-includes/css/admin-bar.css) */
+/* Reuses core's own .ab-icon markup (wp-includes/css/admin-bar.css) */
 /* The doubled `content` declaration hides the decorative glyph from assistive tech reading generated content */
 #wpadminbar > #wp-toolbar > #wp-admin-bar-root-default #wp-admin-bar-uab-hide-admin-bar .ab-icon {
     margin-right: 0;
@@ -71,17 +70,17 @@ html {
     :root {
         --uab-animation-duration: 0s;
     }
-    /* opacity/color aren't tied to --uab-animation-duration (they're a
-       separate, purely cosmetic fade unrelated to the reveal timing JS
-       cares about), so they still need their own override here. */
+    /* opacity/color aren't tied to --uab-animation-duration (a separate,
+       cosmetic fade), so they need their own override here. */
     #wpadminbar,
     #uab-btn-show-admin-bar {
         transition-duration: 0s;
     }
 }
 
-/* wp-includes/css/admin-bar.css hides every top-level #wpadminbar <li> below 782px except a closed allowlist of its own IDs (see the "Show only default top level items" rule).*/
-/* Our toggle li isn't on that list, so without this override there would be no way to hide the bar again once shown on narrow viewports. */
+/* Core hides every top-level #wpadminbar <li> below 782px except its own
+   allowlist; our toggle isn't on it, so without this override there'd be
+   no way to hide the bar again on narrow viewports. */
 @media screen and (max-width: 782px) {
     #uab-btn-show-admin-bar {
         font: 400 28px/1 dashicons;
