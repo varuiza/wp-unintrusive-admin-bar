@@ -8,10 +8,7 @@ function uabReady(callback) {
     }
 }
 
-/**
- * Converts a CSS <time> custom property value (e.g. "300ms" or "0s") into
- * a plain number of milliseconds.
- */
+/** Converts a CSS <time> value (e.g. "300ms" or "0s") to milliseconds. */
 function uabParseCssDuration(value) {
     value = value.trim()
     var milliseconds = parseFloat(value)
@@ -21,21 +18,17 @@ function uabParseCssDuration(value) {
 uabReady(function () {
     var adminBar = document.getElementById('wpadminbar')
     var btnShow = document.getElementById('uab-btn-show-admin-bar')
-    // Rendered server-side by uab_add_admin_bar_hide_toggle() in
-    // unintrusive-admin-bar.php as a native Toolbar API node, so it's
-    // already part of the page instead of popping in once this script
-    // runs. The Toolbar API only gives the wrapping <li> a predictable id
-    // (id="wp-admin-bar-{$node_id}"); its <a> child is plain class="ab-item".
+    // Rendered server-side by uab_add_admin_bar_hide_toggle() (PHP) as a
+    // native Toolbar API node. The API only gives the wrapping <li> a
+    // predictable id ("wp-admin-bar-{$node_id}"); its <a> child is plain.
     var btnHide = document.querySelector('#wp-admin-bar-uab-hide-admin-bar > a')
 
     if (!adminBar || !btnShow || !btnHide) {
         return
     }
 
-    // Single source of truth for this duration lives in css/style.css as
-    // the --uab-animation-duration custom property (including its
-    // prefers-reduced-motion override), so this can never drift out of
-    // sync with the CSS.
+    // Reads the duration from CSS's --uab-animation-duration (including
+    // its prefers-reduced-motion override) so the two never drift apart.
     var ANIMATION_DURATION = uabParseCssDuration(
         getComputedStyle(document.documentElement).getPropertyValue('--uab-animation-duration')
     )
@@ -78,11 +71,9 @@ uabReady(function () {
     }
 
     /**
-     * Reveals the admin bar, mirroring jQuery's slideDown(): grows it from
-     * 0 to its natural height (WP core's own --wp-admin--admin-bar--height
-     * custom property, so this always matches the current responsive
-     * breakpoint) and clips the overflow only while animating, so dropdown
-     * submenus aren't cut off once it's fully open.
+     * Reveals the admin bar, mirroring jQuery's slideDown(): grows it to
+     * its natural height and clips overflow only while animating, so
+     * dropdown submenus aren't cut off once fully open.
      */
     function showAdminBar(done) {
         adminBar.style.overflow = 'hidden'
@@ -128,13 +119,11 @@ uabReady(function () {
         afterTransition(btnShow, 'top', function () {
             showAdminBar(function () {
                 btnHide.focus()
-                // btnShow stays in the DOM (off-screen) while the bar is
-                // shown, unlike btnHide, which is hidden from AT
-                // automatically because it lives inside #wpadminbar.
-                // Without this it would remain a focusable, invisible
-                // control in the tab order for as long as the bar stays
-                // open. Applied only after moving focus away from it, since
-                // aria-hidden must never land on a currently focused element.
+                // btnShow stays in the DOM (off-screen) while shown, unlike
+                // btnHide (hidden from AT via #wpadminbar automatically), so
+                // it needs aria-hidden explicitly - applied only after
+                // moving focus away, since aria-hidden must never land on
+                // the focused element.
                 btnShow.setAttribute('tabindex', '-1')
                 btnShow.setAttribute('aria-hidden', 'true')
                 wp.a11y.speak(uabL10n.shownAnnouncement)
