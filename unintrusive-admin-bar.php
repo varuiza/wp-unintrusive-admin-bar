@@ -1,6 +1,4 @@
 <?php
-defined( 'ABSPATH' ) || die( 'No direct access to files' );
-
 /**
  * Plugin Name: Unintrusive Admin Bar
  * Description: Replaces the WP Admin Bar with a small toggle icon, so it doesn't stay fixed at the top of every page.
@@ -14,7 +12,11 @@ defined( 'ABSPATH' ) || die( 'No direct access to files' );
  * Text Domain: unintrusive-admin-bar
  *
  * Forked and hardened from `plasticbrain`'s abandoned "WP Minimize Admin Bar" (GPLv2 or later).
+ *
+ * @package vr_uab
  */
+
+	defined( 'ABSPATH' ) || die( 'No direct access to files' );
 
 /**
  * Falls back to no explicit version (WordPress then uses its own version
@@ -28,6 +30,11 @@ function uab_asset_version( $path ) {
 	return file_exists( $path ) ? filemtime( $path ) : false;
 }
 
+/**
+ * Enqueues the toggle's CSS/JS, honoring SCRIPT_DEBUG the same way core does
+ * (see wp-includes/script-loader.php's $suffix pattern) so the unminified
+ * source loads while debugging and the minified build ships otherwise.
+ */
 function uab_toggle_admin_bar_assets() {
 	if ( ! is_admin_bar_showing() ) {
 		return;
@@ -65,6 +72,11 @@ function uab_toggle_admin_bar_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'uab_toggle_admin_bar_assets' );
 
+/**
+ * Undoes core's own top padding for the admin bar (_admin_bar_bump_cb,
+ * hooked on wp_head), since this plugin's toggle replaces the fixed bar
+ * and no longer needs that reserved space.
+ */
 function uab_remove_padding() {
 	if ( ! is_admin_bar_showing() ) {
 		return;
@@ -77,6 +89,11 @@ function uab_remove_padding() {
 }
 add_action( 'wp_head', 'uab_remove_padding', 1 );
 
+/**
+ * Renders the frontend-only button that reveals the hidden admin bar.
+ * Hooked on 'wp_after_admin_bar_render' so it lands right after core
+ * prints the bar's own markup, keeping it adjacent in the DOM.
+ */
 function uab_add_admin_bar_toggle() {
 	// Frontend-only by design (see the FAQ in readme.txt). Without this
 	// guard the button would also render in wp-admin, since

@@ -1,0 +1,24 @@
+{
+  "name": "unintrusive-admin-bar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varuiza/wp-unintrusive-admin-bar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/varuiza/wp-unintrusive-admin-bar/issues"
+  },
+  "homepage": "https://github.com/varuiza/wp-unintrusive-admin-bar#readme",
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}
