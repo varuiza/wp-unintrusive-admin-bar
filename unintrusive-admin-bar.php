@@ -31,43 +31,113 @@ function uab_asset_version( $path ) {
 }
 
 /**
- * Resolves the background/icon colors the toggle button should use, based
- * on the current user's admin color scheme (Settings > Profile), so the
- * button blends in with wp-admin instead of using a hardcoded dark theme.
+ * Real #wpadminbar colors for each of core's built-in admin color schemes,
+ * i.e. what wp-admin/css/colors/{scheme}/colors.css actually sets on the
+ * toolbar - a stylesheet core only ever enqueues in wp-admin, never on the
+ * frontend.
  *
- * Reuses core's own registered scheme data (the same array core shows as
- * the scheme preview swatches on the profile screen) rather than
- * duplicating each scheme's palette here.
+ * This can't be derived from the $_wp_admin_css_colors "swatch" array (the
+ * 4 colors core shows as preview swatches on the profile screen): which of
+ * those 4 values ends up as the toolbar's actual background isn't
+ * consistent between schemes - e.g. it's colors[0] for 'fresh' but
+ * colors[1] for 'midnight' and colors[2] for 'blue' - so the swatch array
+ * is only used as a best-effort fallback for custom, non-core schemes in
+ * uab_get_admin_bar_colors() below.
+ */
+const UAB_BUILTIN_SCHEME_COLORS = array(
+	'modern'    => array(
+		'background'       => '#1e1e1e',
+		'text'             => '#fff',
+		'hover_background' => '#0c0c0c',
+		'hover_text'       => '#7b90ff',
+	),
+	'fresh'     => array(
+		'background'       => '#1d2327',
+		'text'             => '#f0f0f1',
+		'hover_background' => '#2c3338',
+		'hover_text'       => '#72aee6',
+	),
+	'light'     => array(
+		'background'       => '#e5e5e5',
+		'text'             => '#333',
+		'hover_background' => '#fff',
+		'hover_text'       => '#04a4cc',
+	),
+	'blue'      => array(
+		'background'       => '#52accc',
+		'text'             => '#fff',
+		'hover_background' => '#4796b3',
+		'hover_text'       => '#fff',
+	),
+	'midnight'  => array(
+		'background'       => '#363b3f',
+		'text'             => '#fff',
+		'hover_background' => '#26292c',
+		'hover_text'       => '#e14d43',
+	),
+	'sunrise'   => array(
+		'background'       => '#cf4944',
+		'text'             => '#fff',
+		'hover_background' => '#be3631',
+		'hover_text'       => '#f7e3d3',
+	),
+	'ectoplasm' => array(
+		'background'       => '#523f6d',
+		'text'             => '#fff',
+		'hover_background' => '#413256',
+		'hover_text'       => '#a3b745',
+	),
+	'ocean'     => array(
+		'background'       => '#738e96',
+		'text'             => '#fff',
+		'hover_background' => '#627c83',
+		'hover_text'       => '#9ebaa0',
+	),
+	'coffee'    => array(
+		'background'       => '#59524c',
+		'text'             => '#fff',
+		'hover_background' => '#46403c',
+		'hover_text'       => '#c7a589',
+	),
+);
+
+/**
+ * Resolves the colors the toolbar (and the toggle button that mirrors it)
+ * should use, based on the current user's admin color scheme (Settings >
+ * Profile), instead of always rendering in core's frontend default (which
+ * is always the dark 'fresh' look, see UAB_BUILTIN_SCHEME_COLORS docblock).
  *
- * @return array{background: string, icon: string, icon_focus: string}
+ * @return array{background: string, text: string, hover_background: string, hover_text: string}
  */
 function uab_get_admin_bar_colors() {
-	global $_wp_admin_css_colors;
+	$scheme_key = get_user_option( 'admin_color' ) ?: 'fresh';
 
-	// register_admin_color_schemes() normally only runs on admin_init, which
-	// never fires on the frontend; it has no admin-only dependencies though,
-	// so it's safe to call directly here to populate the same global.
+	if ( isset( UAB_BUILTIN_SCHEME_COLORS[ $scheme_key ] ) ) {
+		return UAB_BUILTIN_SCHEME_COLORS[ $scheme_key ];
+	}
+
+	// Not one of core's built-in schemes - likely a custom one registered by
+	// another plugin. Approximate it from its color picker swatch data,
+	// since that's the only thing such schemes are guaranteed to expose
+	// outside of admin_init (see the register_admin_color_schemes() call
+	// below, which core normally only runs there).
+	global $_wp_admin_css_colors;
 	if ( empty( $_wp_admin_css_colors ) && function_exists( 'register_admin_color_schemes' ) ) {
 		register_admin_color_schemes();
 	}
 
-	$fallback = array(
-		'background' => '#333',
-		'icon'       => '#ccc',
-		'icon_focus' => '#00b9eb',
-	);
-
-	$scheme_key = get_user_option( 'admin_color' ) ?: 'fresh';
-	$scheme     = $_wp_admin_css_colors[ $scheme_key ] ?? $_wp_admin_css_colors['fresh'] ?? null;
+	$fallback = UAB_BUILTIN_SCHEME_COLORS['fresh'];
+	$scheme   = $_wp_admin_css_colors[ $scheme_key ] ?? null;
 
 	if ( ! $scheme ) {
 		return $fallback;
 	}
 
 	return array(
-		'background' => sanitize_hex_color( $scheme->colors[0] ?? '' ) ?: $fallback['background'],
-		'icon'       => sanitize_hex_color( $scheme->icon_colors['base'] ?? '' ) ?: $fallback['icon'],
-		'icon_focus' => sanitize_hex_color( $scheme->icon_colors['focus'] ?? '' ) ?: $fallback['icon_focus'],
+		'background'       => sanitize_hex_color( $scheme->colors[1] ?? $scheme->colors[0] ?? '' ) ?: $fallback['background'],
+		'text'             => sanitize_hex_color( $scheme->icon_colors['base'] ?? '' ) ?: $fallback['text'],
+		'hover_background' => sanitize_hex_color( $scheme->colors[0] ?? '' ) ?: $fallback['hover_background'],
+		'hover_text'       => sanitize_hex_color( $scheme->icon_colors['focus'] ?? '' ) ?: $fallback['hover_text'],
 	);
 }
 
@@ -101,15 +171,16 @@ function uab_toggle_admin_bar_assets() {
 
 	// Colors ship as CSS custom properties (with the previous hardcoded
 	// values as their var() fallback) so style.css stays the single source
-	// of truth for the button's layout; only the color values come from PHP.
+	// of truth for layout; only the color values come from PHP.
 	$colors = uab_get_admin_bar_colors();
 	wp_add_inline_style(
 		'unintrusive-admin-bar-css',
 		sprintf(
-			':root{--uab-bg-color:%1$s;--uab-icon-color:%2$s;--uab-icon-focus-color:%3$s;}',
+			':root{--uab-bar-bg:%1$s;--uab-bar-text:%2$s;--uab-bar-hover-bg:%3$s;--uab-bar-hover-text:%4$s;}',
 			$colors['background'],
-			$colors['icon'],
-			$colors['icon_focus']
+			$colors['text'],
+			$colors['hover_background'],
+			$colors['hover_text']
 		)
 	);
 
