@@ -31,6 +31,47 @@ function uab_asset_version( $path ) {
 }
 
 /**
+ * Resolves the background/icon colors the toggle button should use, based
+ * on the current user's admin color scheme (Settings > Profile), so the
+ * button blends in with wp-admin instead of using a hardcoded dark theme.
+ *
+ * Reuses core's own registered scheme data (the same array core shows as
+ * the scheme preview swatches on the profile screen) rather than
+ * duplicating each scheme's palette here.
+ *
+ * @return array{background: string, icon: string, icon_focus: string}
+ */
+function uab_get_admin_bar_colors() {
+	global $_wp_admin_css_colors;
+
+	// register_admin_color_schemes() normally only runs on admin_init, which
+	// never fires on the frontend; it has no admin-only dependencies though,
+	// so it's safe to call directly here to populate the same global.
+	if ( empty( $_wp_admin_css_colors ) && function_exists( 'register_admin_color_schemes' ) ) {
+		register_admin_color_schemes();
+	}
+
+	$fallback = array(
+		'background' => '#333',
+		'icon'       => '#ccc',
+		'icon_focus' => '#00b9eb',
+	);
+
+	$scheme_key = get_user_option( 'admin_color' ) ?: 'fresh';
+	$scheme     = $_wp_admin_css_colors[ $scheme_key ] ?? $_wp_admin_css_colors['fresh'] ?? null;
+
+	if ( ! $scheme ) {
+		return $fallback;
+	}
+
+	return array(
+		'background' => sanitize_hex_color( $scheme->colors[0] ?? '' ) ?: $fallback['background'],
+		'icon'       => sanitize_hex_color( $scheme->icon_colors['base'] ?? '' ) ?: $fallback['icon'],
+		'icon_focus' => sanitize_hex_color( $scheme->icon_colors['focus'] ?? '' ) ?: $fallback['icon_focus'],
+	);
+}
+
+/**
  * Enqueues the toggle's CSS/JS, honoring SCRIPT_DEBUG the same way core does
  * (see wp-includes/script-loader.php's $suffix pattern) so the unminified
  * source loads while debugging and the minified build ships otherwise.
@@ -57,6 +98,21 @@ function uab_toggle_admin_bar_assets() {
 	// and admin-bar.js also manipulates #wpadminbar, so running after it
 	// avoids two scripts racing over the same DOM.
 	wp_enqueue_style( 'unintrusive-admin-bar-css', $css_url, array( 'admin-bar' ), uab_asset_version( $css_path ) );
+
+	// Colors ship as CSS custom properties (with the previous hardcoded
+	// values as their var() fallback) so style.css stays the single source
+	// of truth for the button's layout; only the color values come from PHP.
+	$colors = uab_get_admin_bar_colors();
+	wp_add_inline_style(
+		'unintrusive-admin-bar-css',
+		sprintf(
+			':root{--uab-bg-color:%1$s;--uab-icon-color:%2$s;--uab-icon-focus-color:%3$s;}',
+			$colors['background'],
+			$colors['icon'],
+			$colors['icon_focus']
+		)
+	);
+
 	// 'wp-a11y' gives us wp.a11y.speak(), core's screen-reader announcement
 	// utility, instead of hand-rolling another aria-live region.
 	wp_enqueue_script( 'unintrusive-admin-bar-js', $js_url, array( 'admin-bar', 'wp-a11y' ), uab_asset_version( $js_path ), true );

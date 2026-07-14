@@ -29,8 +29,8 @@ html {
     top: -50px;
     left: 5px;
     z-index: 1000000;
-    background-color: #333;
-    color: #ccc;
+    background-color: var(--uab-bg-color, #333);
+    color: var(--uab-icon-color, #ccc);
     padding: 5px;
     border-radius: 5px;
     transition:
@@ -47,7 +47,7 @@ html {
 }
 #uab-btn-show-admin-bar:hover,
 #uab-btn-show-admin-bar:focus-visible {
-    color: #00b9eb;
+    color: var(--uab-icon-focus-color, #00b9eb);
     opacity: 1;
 }
 
