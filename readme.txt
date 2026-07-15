@@ -23,6 +23,7 @@ Unintrusive Admin Bar is a simple plugin that replaces the WordPress admin bar w
 * Keyboard and screen-reader accessible: proper focus handling and live announcements via `wp.a11y.speak()`.
 * Respects your operating system's "reduce motion" preference.
 * Reuses WordPress's own toolbar markup and icon styling, so the toggle always looks consistent with the rest of the admin bar.
+* Matches the admin bar and the toggle icon to the current user's admin color scheme (Settings > Profile), instead of always rendering in the frontend's hardcoded dark default.
 * Frontend-only: never changes anything in wp-admin.
 * Collects no data and makes no external requests.
 
@@ -82,6 +83,8 @@ No. It makes no external requests and doesn't store anything of its own.
 * Remove the jQuery dependency entirely in favor of plain JavaScript and CSS transitions, so logged-in visitors on themes that don't otherwise need jQuery no longer have it forced onto every page.
 * Depend on WordPress's own `admin-bar` and `wp-a11y` script/style handles instead of relying on incidental load order.
 * Ship minified `style.min.css`/`app.min.js` alongside the source, and load them by default using WordPress core's own `SCRIPT_DEBUG` convention (unminified only while `SCRIPT_DEBUG` is on).
+* Recolor the admin bar and the toggle icon to match the current user's admin color scheme (Settings > Profile). WordPress only ever loads scheme-specific styling in wp-admin, so previously the frontend bar always rendered in its hardcoded dark default no matter which scheme was chosen.
+* Fix the admin bar's icon hover/focus colors to follow the chosen scheme's accent color too, instead of always flashing the default scheme's blue.
 
 == Upgrade Notice ==
 

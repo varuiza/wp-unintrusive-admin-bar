@@ -22,6 +22,60 @@ html {
     max-height: var(--wp-admin--admin-bar--height, 32px);
 }
 
+/* Recolors the real admin bar to match the user's chosen admin color
+   scheme (Settings > Profile). Core only ever loads scheme-specific CSS in
+   wp-admin (wp-admin/css/colors/{scheme}/colors.css) - the frontend bar
+   otherwise always renders in its baked-in dark default regardless of the
+   scheme picked. Selectors are copied verbatim from wp-includes/css/
+   admin-bar.css so specificity ties with core's own rules and our (later
+   loaded) declaration wins the cascade; --uab-bar-* fall back to core's
+   own defaults when PHP didn't provide a value. */
+#wpadminbar {
+    background: var(--uab-bar-bg, #1d2327);
+}
+#wpadminbar .ab-empty-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar > #wp-toolbar span.noticon {
+    color: var(--uab-bar-text, #f0f0f1);
+}
+#wpadminbar .ab-icon:before,
+#wpadminbar .ab-item:before,
+#wpadminbar #adminbarsearch:before {
+    color: inherit;
+}
+#wpadminbar .menupop .ab-sub-wrapper,
+#wpadminbar .shortlink-input {
+    background: var(--uab-bar-hover-bg, #2c3338);
+}
+#wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
+#wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+#wpadminbar .ab-top-menu > li.hover > .ab-item {
+    background: var(--uab-bar-hover-bg, #2c3338);
+    color: var(--uab-bar-hover-text, #72aee6);
+}
+#wpadminbar:not(.mobile) > #wp-toolbar li:hover span.ab-label,
+#wpadminbar > #wp-toolbar li.hover span.ab-label,
+#wpadminbar:not(.mobile) > #wp-toolbar a:focus span.ab-label {
+    color: var(--uab-bar-hover-text, #72aee6);
+}
+/* Core hardcodes this icon hover/focus color instead of inheriting it from
+   the .ab-item color rule above, so it needs its own `inherit` override -
+   otherwise every scheme's icons would flash the 'fresh' accent (#72aee6)
+   on hover regardless of the chosen scheme. */
+#wpadminbar li:hover .ab-icon:before,
+#wpadminbar li:hover .ab-item:before,
+#wpadminbar li a:focus .ab-icon:before,
+#wpadminbar li .ab-item:focus:before,
+#wpadminbar li .ab-item:focus .ab-icon:before,
+#wpadminbar li.hover .ab-icon:before,
+#wpadminbar li.hover .ab-item:before,
+#wpadminbar li:hover #adminbarsearch:before,
+#wpadminbar li #adminbarsearch.adminbar-focused:before {
+    color: inherit;
+}
+
 #uab-btn-show-admin-bar {
     font: 400 16px/1 dashicons;
     text-decoration: none !important;
@@ -29,8 +83,8 @@ html {
     top: -50px;
     left: 5px;
     z-index: 1000000;
-    background-color: #333;
-    color: #ccc;
+    background-color: var(--uab-bar-bg, #333);
+    color: var(--uab-bar-text, #ccc);
     padding: 5px;
     border-radius: 5px;
     transition:
@@ -47,7 +101,7 @@ html {
 }
 #uab-btn-show-admin-bar:hover,
 #uab-btn-show-admin-bar:focus-visible {
-    color: #00b9eb;
+    color: var(--uab-bar-hover-text, #00b9eb);
     opacity: 1;
 }
 
